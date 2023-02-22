@@ -40,9 +40,9 @@ unsigned char * gb_list_dsk_sects[MAX_DSKS];
 unsigned char * gb_list_dsk_discid[MAX_DSKS];
 unsigned char * gb_list_dsk_discdat[MAX_DSKS];
 
-#define listItemsTotal 100 //maximum number of file names to store
-#define listItemMaxChar 100 //maximum number of characters per file name, including null terminator
-char tempString[listItemMaxChar];//temporary string of the max number of characters per file name
+#define listItemsTotal 100 
+#define listItemMaxChar 100 
+char tempString[listItemMaxChar];
 
 using namespace std;
 
@@ -55,10 +55,10 @@ void getDskList() {
 
   while (true) {
     File entry = root.openNextFile();
-    if (!entry) {break;} // no more files
+    if (!entry) {break;}
     else {
-      sprintf(tempString, "%s", entry.name());//save file name to temporary string with null terminator at the end
-      gb_list_dsk_title[max_list_dsk] = (char *)malloc(listItemMaxChar);//assign enough memory for 100 chars to current list item pointer
+      sprintf(tempString, "%s", entry.name());
+      gb_list_dsk_title[max_list_dsk] = (char *)malloc(listItemMaxChar);
       sprintf(gb_list_dsk_title[max_list_dsk],"%s",tempString);
       max_list_dsk++; //increment counter of files
       entry.close();
@@ -67,17 +67,6 @@ void getDskList() {
   return; 
 }
 
-
-FILE *loaddskFromSD(char *nombre) {
-
-  //customSPI.begin(SDCARD_CLK, SDCARD_MISO, SDCARD_MOSI, SDCARD_CS);
-  //SD.begin(SDCARD_CS, customSPI, 4000000, "/sd");
-  return fopen(nombre, "rb");
-
-//file.close();
-//SD.end();
-//customSPI.end();
-}
 
 void loaddsk2Flash(unsigned char id)
 {
@@ -88,13 +77,13 @@ void loaddsk2Flash(unsigned char id)
         unsigned char *dskhead,*trkhead;
 
         sprintf(fileName, "/sd/dsk/%s", gb_list_dsk_title[id]);
-        printf("Vamos a cargar %s\n", fileName);           
+        
         head=(char *)ps_malloc(40 * sizeof(char));
         dskhead=(unsigned char *)ps_malloc(256 * sizeof(unsigned char));
         trkhead=(unsigned char *)ps_malloc(256 * sizeof(unsigned char));
         discdat=(Tdiscdats *)ps_malloc(sizeof(Tdiscdats));
         
-        FILE *f=loaddskFromSD(fileName);
+        FILE *f=fopen(fileName, "rb");
         if (!f) {
           printf("No se ha cargado el disco\n");
           return;
@@ -108,19 +97,15 @@ void loaddsk2Flash(unsigned char id)
         
         for (d=0;d<disctracks;d++) {
                 fread(trkhead,256,1,f);
-                //JJ while (strncmp(trkhead,"Track-Info",10) && !feof(f))
-                while (strncmp((const char *)trkhead,"Track-Info",10) && !feof(f)) {
+                while (strncmp((const char *)trkhead,"Track-Info",10) && !feof(f)) 
                       fread(trkhead,256,1,f);
-                }
-                //printf("Track %i ftell %05X : ",d,ftell(f)-256);
-
+                
                 if (feof(f)) {
                         fclose(f);
                         return;
                 }
                 
                 discsects[d]=numsect=trkhead[0x15];
-                //printf("%i sectors\n",numsect);
                 for (c=0;c<numsect;c++) {
                         discid[d][c][0]=trkhead[0x18+(c<<3)];
                         discid[d][c][1]=trkhead[0x19+(c<<3)];
@@ -131,11 +116,8 @@ void loaddsk2Flash(unsigned char id)
                 }
                 printf("\n");
         }
-        //printf("DSK pos %i\n",ftell(f));
         fclose(f);
 }
-
-
 
 unsigned char readfdc(unsigned short addr)
 {
