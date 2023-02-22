@@ -1,12 +1,11 @@
 
 # Tiny ESP32 AMSTRAD CPC
-Port del emulador de PC de Tom Walker (AMSTRAD CPC) a la placa TTGO VGA32 v1.x (1.0, 1.1, 1.2, 1.4) con ESP32.
+Port del emulador de PC de Tom Walker (AMSTRAD CPC) a la placa TTGO VGA32 v1.4 con ESP32.
 <br>
 <center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TinyCPC/main/preview/previewCPC464.gif'></center>
 He realizado varias modificaciones:
 <ul>
  <li>Portado de x86 PC a ESP32</li>
- <li>No se usa PSRAM, funcionando en ESP32 de 520 KB de RAM (TTGO VGA32 v1.2)</li> 
  <li>Uso de un sólo core</li>
  <li>OSD de bajos recursos</li>
  <li>Creado proyecto compatible con Arduino IDE y Platform IO</li>
@@ -15,6 +14,7 @@ He realizado varias modificaciones:
  <li>Menú de velocidad de CPU de emulación (AUTO), sonido, teclado</li>
  <li>Soporte para modo 8 y 64 colores (versión reducida de Ricardo Massaro).</li>
  <li>Soporte DSK de 42 tracks y 11 sectores.</li>
+ <li>Carga de archivos DSK desde la tarjeta SD (deben estar en /dsk).</li>
  <li>Emula sólo el CRTC 0</li>
  <li>Soporta modo 0, 1 y 2 de video</li>
  <li>VGA 400x300</li>
@@ -30,8 +30,7 @@ He realizado varias modificaciones:
 <h1>Requerimientos</h1>
 Se requiere:
  <ul>
-  <li>TTGO VGA32 v1.x (1.0, 1.1, 1.2, 1.4)</li>
-  <li>Visual Studio 1.48.1 PLATFORMIO 2.2.1 Espressif32 v3.3.2</li>
+  <li>TTGO VGA32 v1.4</li>
   <li>Arduino IDE 1.8.11 Espressif System 1.0.6</li>
   <li>Librería reducida Arduino fabgl 0.9.0 (incluida en proyecto PLATFORMIO)</li>
   <li>Librería reducida Arduino bitluni 0.3.3 (incluida en proyecto)</li>
@@ -40,17 +39,6 @@ Se requiere:
 <br>
  
  
-<h1>PlatformIO</h1>
-Se debe instalar el PLATFORMIO 2.2.1 desde las extensiones del Visual Studio. Se requiere también Espressif32 v3.3.2.
-<center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TinyCPC/main/preview/previewPlatformIOinstall.gif'></center>
-Luego se seleccionará el directorio de trabajo <b>TinyCPCEMttgovga32</b>.
-Debemos modificar el fichero <b>platformio.ini</b> la opción <b>upload_port</b> para seleccionar el puerto COM donde tenemos nuestra placa TTGO VGA32.
-<center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TinyCPC/main/preview/previewPlatformIO.gif'></center>
-Luego procederemos a compilar y subir a la placa. No se usa particiones, así que debemos subir todo el binario compilado.
-Está todo preparado para no tener que instalar las librerias de bitluni ni fabgl.
-
-
-<br>
 <h1>Arduino IDE</h1>
 Todo el proyecto es compatible con la estructura de Arduino 1.8.11.
 Tan sólo tenemos que abrir el <b>CPCem.ino</b> del directorio <b>CPCem</b>.
@@ -58,8 +46,8 @@ Tan sólo tenemos que abrir el <b>CPCem.ino</b> del directorio <b>CPCem</b>.
 Debemos instalar las extensiones de spressif en el gestor de urls adicionales de tarjetas <b>https://dl.espressif.com/dl/package_esp32_index.json</b>
 <br>
 Ya está preparado el proyecto, de forma que no se necesita ninguna librería de bitluni ni fabgl.
-Debemos desactivar la opción de PSRAM, y en caso de superar 1 MB de binario, seleccionar 4 MB de partición a la hora de subir. Aunque el código no use PSRAM, si la opción está activa y nuestro ESP32 no dispone de ella, se generará una excepción y reinicio del mismo en modo bucle.
-
+Debemos activar la opción de PSRAM, y en caso de superar 1 MB de binario, seleccionar 4 MB de partición a la hora de subir.
+En el Arduino IDE, debemos elegir la opción <b>Partition Scheme (Huge APP).
 
 
 <br>
@@ -80,9 +68,6 @@ Se permiten las siguientes acciones desde el menú (tecla F1):
  </ul>
  Se dispone de un OSD básico de bajos recursos, es decir, muy simple, que se visualiza pulsando la tecla <b>F1</b>.
  <center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TinyCPC/main/preview/previewOSD.gif'></center>
- Los ficheros deben ser convertidos a .h en hexadecimal. Puede usarse la herramienta online:<br>
- <a href='http://tomeko.net/online_tools/file_to_hex.php?lang=en'>http://tomeko.net/online_tools/file_to_hex.php?lang=en</a>
- Los DSK están en formato DUMP para ahorrar memoria, y se debe utilizar la herramienta <b>dsk2h</b> para generar los .h necesarios.
  
  
 <br>
@@ -113,122 +98,10 @@ El archivo <b>gbConfig.h</b> se seleccionan las opciones:
 
 
 <br>
-<h1>Aplicaciones Test</h1>
-Al arrancar el ESP32, se realiza en modo CPC464 cargando el BASIC.
-Podemos elegir los siguientes juegos:
-<ul>
- <li><b>Corsair Trainer</b></li>
- <li><b>Dragon Attack</b></li>
- <li><b>Babas Palace</b></li>
- <li><b>Amsthrees</b></li>
- <li><b>Sokoban</b></li>
- <li><b>Max Desk:</b> prueba de ratón</li>
- <li><b>AMX Mouse:</b> Editor de imágenes con ratón</li> 
-</ul>
-
-Se ha compactado todo en varios discos:
-<pre> 
- Disco 1 
-  babaspalace
-   cod0.bin 40K
-   cod1.bin 2K
-   disc.bas 1K
-   intro.bin 9K
-   loader.bin 1K
-   screen.scr 17K
-  amsthree
-   amsthre3.scr 17K
-   amsthree.bin 38K
-   loader.bas 1K
-  sokoban
-   sokoban.bin 9K
-   sokoban.dat 19K
- 
- 
- Disco 2
-  corsair trainer
-   code.bin 16K
-   codex.bin 16K
-   data.bin 17K
-   disc.bin 8K
-   intro.bin 17K
-   menuexo.bin  3K
-  amxmousev2
-   amx.bas 1K
-   art.bin 9K
-   art.icn 2K
-   char.bin 1K
-   colhats.bin 1K
-   demloa.bin 1K
-   demo.rs 9K
-   icondes.bas 10K
-   monmc.bin 1K
-   mspr.bin 2K 
-   ocode.bin 1K
-   pat1.pcn 1K
-   patdes.bas 8K
-   pgen.bas 11K
-   rom.icn 2K
-   rsxb.bin 2K
-   scrload.bas 2K
-   vdutab.o 1K
-
-
- Disco3
-  Max desk oculto
-   maxdesk 1k
-   maxdesk.n01 1k
-   maxdesk.n02 34k
-   maxdesk.n04 17k
-   maxdesk.n05 2k
-   sysvars.bin 1k
-   dragon attack
-   block1.bin 5K
-   block2.bin 4K
-   block3.bin 5K
-   block4.bin 5K
-   block5.bin 5K
-   block6.bin 5K
-   block7.bin 5K
-   block8.bin 5K
-   code.bin 28K
-   disc.bin 1k
-   disc-ni.bin 1k
-</pre>
-
-
-
-<br>
 <h1>AMX Mouse</h1>
 Para poder usar un ratón como si fuera un AMX Mouse, se requiere activar en el fichero de configuración el soporte.
 <center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TinyCPC/main/preview/previewAmxMouse.gif'></center>
 Se permite configurar el ratón para zurdos (también desde el OSD), así como los tiempos de muestreo, todo ello en el fichero <b>gbConfig.h</b>.
-
-<br><br>
-<h1>DIY circuito</h1>
-Si no queremos usar una placa TTGO VGA32 v1.x, podemos construirla siguiendo el esquema de <b>fabgl</b>:
-<center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TinyCPC/main/preview/fabglcircuit.gif'></center>
-
-<br><br>
-<h1>Tool dsk2h</h1>
-He creado una herramienta muy básica, para convertir los archivos .dsk en .h, así como roms en modo lista para ser procesados por el emulador. Tan sólo tenemos que dejar los archivos .dsk en la carpeta <b>dsks</b>, así como .rom en <b>romextra</b> y ejecutar el archivo <b>dsk2h.exe</b>, de forma que se generará una salida en el directorio <b>dataFlash</b>. Para pruebas, se ha dejado 2 archivos en el directorio <b>dsks</b>, así como un par de roms, que se recomienda borrar en caso de realizar una nueva lista personalizada. También se recomienda borrar los archivos del directorio <b>CPCem\dataFlash\dsk</b> para tener un proyecto limpio.<br><br>
-<a href='https://github.com/rpsubc8/ESP32TinyCPC/tree/main/tools/dsk2h'>Tool dsk2h</a>
-<br><br>
-<pre>
- input/
-  dsks/
-  romextra/
- output/ 
-  dataFlash/
-   dsk/
-   romextra/   
-</pre>
-Posteriormente debemos copiar el directorio <b>dataFlash</b> en el proyecto <b>TinyCPCEMttgovga32\CPCem</b> sobreescribiendo la carpeta dataFlash previa. Se recomienda limpiar el proyecto y volver a compilar.<br>
-Esta herramienta es muy simple, y no controla los errores, por lo que se recomienda dejarle los archivos con nombres muy simples y lo más sencillo posible.<br>
-El proyecto en PLATFORM.IO está preparado para 2 MB de Flash. Si necesitamos los 4MB de flash, tendremos que modificar la entrada del archivo <b>platformio.ini</b>
-<pre>board_build.partitions = huge_app.csv</pre>
-En el Arduino IDE, debemos elegir la opción <b>Partition Scheme (Huge APP)</b>.
-
 
 <br><br>
 <h1>Cargar ROMS</h1>
