@@ -4,7 +4,6 @@
 #include "CRTC.h"
 #include "FDC.h"
 #include "Z80.h"
-#include "dataFlash/gbdsk.h"
 #include "dataFlash/gbromextra.h"
 #include "gbGlobals.h"
 #include "PS2Kbd.h"
@@ -453,16 +452,17 @@ void ShowTinyDSKMenu()
 {
  unsigned char aSelNum;     
  aSelNum = ShowTinyMenu("Machine DSK",gb_machine_menu,max_gb_machine_menu);
+
  if (aSelNum != 255)
  {
   if (aSelNum == 0)
   {
-   aSelNum = ShowTinyMenu("464 DSK",gb_list_dsk_title,max_list_dsk);  
+   aSelNum = ShowTinyMenu("464 DSK",(const char**)gb_list_dsk_title,max_list_dsk);  
    loaddsk2Flash(aSelNum);
   }
   else
   {
-   aSelNum = ShowTinyMenu("6128 DSK",gb_list_dsk_title,max_list_dsk);                
+   aSelNum = ShowTinyMenu("6128 DSK",(const char**)gb_list_dsk_title,max_list_dsk);                
    loaddsk2Flash(aSelNum);  
   }
  }         
@@ -874,4 +874,3 @@ void do_tinyOSD()
   gb_silence_all_channels = gb_mute_sound;
  #endif 
 }
-
