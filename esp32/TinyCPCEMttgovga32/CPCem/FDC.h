@@ -3,7 +3,6 @@
  
  void getDskList(void);
  void loaddsk2Flash(unsigned char id);
- void loaddsk(void);
  unsigned char readfdc(unsigned short addr);
  void writefdc(unsigned short addr, unsigned char val);
  
