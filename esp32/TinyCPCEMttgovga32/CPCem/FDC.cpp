@@ -5,8 +5,14 @@
 #include <stdlib.h>
 #include "FDC.h"
 #include "gbGlobals.h"
-#include "dataFlash/gbdsk.h"
 #include <iostream>
+#include "SD.h"
+
+#define SDCARD_CS 13
+#define SDCARD_MOSI 12
+#define SDCARD_MISO 2
+#define SDCARD_CLK 14
+static SPIClass customSPI;
 
 //unsigned char gb_select_dsk_disk=0;
 //int gb_ptrBeginDataDisc[42][11]; //Donde empieza el disco
@@ -24,128 +30,116 @@ int fdctrack;
 int starttrack,startsector,endsector;
 int posinsector;
 unsigned char reading=0;
-Tdiscsect *discsects;
-//JJ int disctracks; //no lo necesito
-//JJ int discsects[40]; //esta en rom
-//JJ unsigned char discdat[42][11][512];
-//unsigned char discid[42][11][4];
-Tdiscid *discid;
+int disctracks; 
+int discsects[40]; //esta en rom
+unsigned char discid[42][11][4];
 Tdiscdat *discdat;
+int max_list_dsk=0;
+char * gb_list_dsk_title[MAX_DSKS];
+unsigned char * gb_list_dsk_sects[MAX_DSKS];
+unsigned char * gb_list_dsk_discid[MAX_DSKS];
+unsigned char * gb_list_dsk_discdat[MAX_DSKS];
+
+#define listItemsTotal 100 //maximum number of file names to store
+#define listItemMaxChar 100 //maximum number of characters per file name, including null terminator
+char tempString[listItemMaxChar];//temporary string of the max number of characters per file name
 
 using namespace std;
 
-void dumpdisc()
-{
-//JJ        FILE *f=fopen("disk.dmp","wb");
-//JJ        fwrite(discdat[0][0],512,1,f);
-//JJ        fclose(f);
+void getDskList() {
+
+  customSPI.begin(SDCARD_CLK, SDCARD_MISO, SDCARD_MOSI, SDCARD_CS);
+  SD.begin(SDCARD_CS, customSPI, 4000000, "/sd");
+
+  File root = SD.open("/dsk");
+
+  while (true) {
+    File entry = root.openNextFile();
+    if (!entry) {break;} // no more files
+    else {
+      sprintf(tempString, "%s", entry.name());//save file name to temporary string with null terminator at the end
+      gb_list_dsk_title[max_list_dsk] = (char *)malloc(listItemMaxChar);//assign enough memory for 100 chars to current list item pointer
+      sprintf(gb_list_dsk_title[max_list_dsk],"%s",tempString);
+      max_list_dsk++; //increment counter of files
+      entry.close();
+    }
+  }
+  return; 
+}
+
+
+FILE *loaddskFromSD(char *nombre) {
+
+  //customSPI.begin(SDCARD_CLK, SDCARD_MISO, SDCARD_MOSI, SDCARD_CS);
+  //SD.begin(SDCARD_CS, customSPI, 4000000, "/sd");
+  return fopen(nombre, "rb");
+
+//file.close();
+//SD.end();
+//customSPI.end();
 }
 
 void loaddsk2Flash(unsigned char id)
 {
- discid = (Tdiscid *)gb_list_dsk_discid[id];
- discdat = (Tdiscdat *)gb_list_dsk_discdat[id];;
 
-/* int contBuffer=0;
- int numsect;
- int c,d;
- char head[40];
- unsigned char dskhead[256],trkhead[256];
- 
- gb_select_dsk_disk = id;
- 
- memcpy(dskhead,&gb_list_dsk_data[id][contBuffer],256);
- cout<<"Fichero "<<dskhead<<"\n";
- contBuffer+= 256;
- for (c=0;c<40;c++) head[c]=0;
- for (c=0;c<0x21;c++) head[c]=dskhead[c];
- disctracks=dskhead[0x30];
- //printf ("Head\nDisc tracks %d ",disctracks);
- for (d=0;d<disctracks;d++)
- {
-  memcpy(trkhead,&gb_list_dsk_data[id][contBuffer],256);
-  contBuffer+= 256;
-  //cout<< "cont " <<contBuffer<<"\n";
-  while (strncmp((const char *)trkhead,"Track-Info",10) && contBuffer< gb_list_dsk_size[id])
-  {//194816 bytes normalmente
-   memcpy(trkhead,&gb_list_dsk_data[id][contBuffer],256);
-   contBuffer+= 256;
-   //printf ("cont %d\n", contBuffer);
-   if (contBuffer > gb_list_dsk_size[id])
-    return;      
-  }
-  discsects[d]=numsect=trkhead[0x15];   
-  //printf ("Num sects %d\n", numsect);
-  for (c=0;c<numsect;c++)
-  {
-   //if (c == 0)
-   //{
-   // gb_ptrBeginDataDisc[d] = contBuffer; //Donde empieza disco      
-   // printf("Disco begin %d Track ",gb_ptrBeginDataDisc[d],d);    
-   //}
-   discid[d][c][0]=trkhead[0x18+(c<<3)];
-   discid[d][c][1]=trkhead[0x19+(c<<3)];
-   discid[d][c][2]=trkhead[0x1A+(c<<3)];
-   discid[d][c][3]=trkhead[0x1B+(c<<3)];
-   //printf("%i %i %i %i  ",discid[d][c][0],discid[d][c][1],discid[d][c][2],discid[d][c][3]);
-//JJ   memcpy(&(discdat[d][(discid[d][c][2]-1)&15]),&(gb_list_dsk_data[id][contBuffer]),512);
-   gb_ptrBeginDataDisc[d][c]=contBuffer;
-   //printf("Begin Track:%d Sector:%d Address:%d\n",d,c,gb_ptrBeginDataDisc[d][c]);
-   contBuffer+= 512;
-  }  
- }
- //printf ("\n");
- */
-}
-
-/*
-void loaddsk()
-{
         int numsect;
         int c,d;
-        char head[40];
-        unsigned char dskhead[256],trkhead[256];
-        FILE *f=fopen(discname,"rb");
-        if (!f) return;
-        fread(dskhead,256,1,f);
+        char *head, fileName[max_list_dsk];
+        unsigned char *dskhead,*trkhead;
+
+        sprintf(fileName, "/sd/dsk/%s", gb_list_dsk_title[id]);
+        printf("Vamos a cargar %s\n", fileName);           
+        head=(char *)ps_malloc(40 * sizeof(char));
+        dskhead=(unsigned char *)ps_malloc(256 * sizeof(unsigned char));
+        trkhead=(unsigned char *)ps_malloc(256 * sizeof(unsigned char));
+        discdat=(Tdiscdats *)ps_malloc(sizeof(Tdiscdats));
+        
+        FILE *f=loaddskFromSD(fileName);
+        if (!f) {
+          printf("No se ha cargado el disco\n");
+          return;
+        }
+        fread(dskhead,256,1,f);        
         for (c=0;c<40;c++) head[c]=0;
         for (c=0;c<0x21;c++) head[c]=dskhead[c];
+        
         disctracks=dskhead[0x30];
-//        printf("%i tracks\n",dskhead[0x30]);
-//        printf("%s\n",head);
-        for (d=0;d<disctracks;d++)
-        {
+        //printf("%i tracks\n",dskhead[0x30]);
+        
+        for (d=0;d<disctracks;d++) {
                 fread(trkhead,256,1,f);
                 //JJ while (strncmp(trkhead,"Track-Info",10) && !feof(f))
-                while (strncmp((const char *)trkhead,"Track-Info",10) && !feof(f))
+                while (strncmp((const char *)trkhead,"Track-Info",10) && !feof(f)) {
                       fread(trkhead,256,1,f);
-//                printf("Track %i ftell %05X : ",d,ftell(f)-256);
-                if (feof(f))
-                {
+                }
+                //printf("Track %i ftell %05X : ",d,ftell(f)-256);
+
+                if (feof(f)) {
                         fclose(f);
                         return;
                 }
+                
                 discsects[d]=numsect=trkhead[0x15];
-//                printf("%i sectors\n",discsects[d]);
-                for (c=0;c<numsect;c++)
-                {
+                //printf("%i sectors\n",numsect);
+                for (c=0;c<numsect;c++) {
                         discid[d][c][0]=trkhead[0x18+(c<<3)];
                         discid[d][c][1]=trkhead[0x19+(c<<3)];
                         discid[d][c][2]=trkhead[0x1A+(c<<3)];
                         discid[d][c][3]=trkhead[0x1B+(c<<3)];
-//                        printf("%i %i %i %i  ",discid[d][c][0],discid[d][c][1],discid[d][c][2],discid[d][c][3]);
-//JJ                        fread(discdat[d][(discid[d][c][2]-1)&15],512,1,f);
+                        //printf("%i %i %i %i  ",discid[d][c][0],discid[d][c][1],discid[d][c][2],discid[d][c][3]);
+                        fread(discdat->datos[d][(discid[d][c][2]-1)&15],512,1,f);                        
                 }
-//                printf("\n");
+                printf("\n");
         }
-//        printf("DSK pos %i\n",ftell(f));
+        //printf("DSK pos %i\n",ftell(f));
         fclose(f);
 }
-*/
+
+
 
 unsigned char readfdc(unsigned short addr)
 {
-        unsigned char aux_discdat/*[11]*/[1024];
+        unsigned char aux_discdat[1024];
         int c;
         unsigned char temp;
 //        printf("Read %04X  %04X\n",addr,pc);
@@ -194,7 +188,7 @@ unsigned char readfdc(unsigned short addr)
                                                 posinsector=0;
                                                 startsector++;
                                                 //JJ if ((startsector&15)==(discsects[fdctrack]+1))
-                                                if ((startsector&15)==(discsects->datos[fdctrack]+1))
+                                                if ((startsector&15)==(discsects[fdctrack]+1))
                                                 {
                                                         if (command&0x80)
                                                            fdctrack++;
@@ -203,7 +197,7 @@ unsigned char readfdc(unsigned short addr)
                                                 startreal=0;
                                                 for (c=0;c<11;c++)
                                                 {
-                                                        if ((discid->datos[starttrack][c][2]&15)==(startsector&15))
+                                                        if ((discid[starttrack][c][2]&15)==(startsector&15))
                                                         {
                                                                 startreal=c;
                                                                 break;
@@ -253,10 +247,10 @@ unsigned char readfdc(unsigned short addr)
                                 case 6: return st0;
                                 case 5: return st1;
                                 case 4: return st2;
-                                case 3: return discid->datos[fdctrack][startsector][0];
-                                case 2: return discid->datos[fdctrack][startsector][1];
-                                case 1: return discid->datos[fdctrack][startsector][2];
-                                case 0: fdcstatus=0x80; return discid->datos[fdctrack][startsector][3];
+                                case 3: return discid[fdctrack][startsector][0];
+                                case 2: return discid[fdctrack][startsector][1];
+                                case 1: return discid[fdctrack][startsector][2];
+                                case 0: fdcstatus=0x80; return discid[fdctrack][startsector][3];
                         }
                         break;
 
