@@ -140,27 +140,24 @@ extern int fdctrack;
 extern int starttrack,startsector,endsector;
 extern int posinsector;
 extern unsigned char reading;
-//JJ extern int disctracks; //no lo necesito
-//extern int discsects[40]; //esta en rom
+extern int disctracks;
+extern int discsects[40]; //esta en rom
 //JJ extern unsigned char discdat[42][11][512];
-//extern unsigned char discid[42][11][4];
- typedef struct Tdiscsects
- {
-  unsigned char datos[40];
- }Tdiscsect;
- typedef struct Tdiscids
- {
-  unsigned char datos[42][11][4];
- }Tdiscid;
+extern unsigned char discid[42][11][4];
+ 
  typedef struct Tdiscdats
  {
   unsigned char datos[42][11][512];
- }Tdiscdat; 
- extern Tdiscsect *discsects;
- extern Tdiscid *discid;
- extern Tdiscdat *discdat;
+ }Tdiscdat;
+extern Tdiscdat *discdat;
 
+#define MAX_DSKS 100
 
+extern int max_list_dsk;
+extern char * gb_list_dsk_title[MAX_DSKS];
+extern unsigned char * gb_list_dsk_sects[MAX_DSKS];
+extern unsigned char * gb_list_dsk_discid[MAX_DSKS];
+extern unsigned char * gb_list_dsk_discdat[MAX_DSKS];
 
 //GA
 extern int palentry;
@@ -220,5 +217,3 @@ extern unsigned char gb_id_run_rom;
 extern unsigned int gb_timer_run_rom_ini;
 
 #endif
-
- 
