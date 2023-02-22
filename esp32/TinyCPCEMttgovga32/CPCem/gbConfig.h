@@ -36,12 +36,12 @@
  //#endif 
  
  //RAM mode
- //#define use_lib_128k
+ #define use_lib_128k
  //#define use_lib_cheat_128k 
  //#define use_lib_fix_psram_128k
 
  //Sound
- //#define use_lib_sound_ay8912
+ #define use_lib_sound_ay8912
 
  //Measure times (si no se usa va mas rapido)
  //#define use_lib_measure_time
