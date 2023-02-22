@@ -670,6 +670,7 @@ void setup()
  loadroms2FlashModel();
  resetz80();
  resetcrtc();
+ getDskList();
  loaddsk2Flash(0);
 
  gb_keyboardTime = gb_currentTime = millis();
