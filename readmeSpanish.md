@@ -47,7 +47,7 @@ Debemos instalar las extensiones de spressif en el gestor de urls adicionales de
 <br>
 Ya está preparado el proyecto, de forma que no se necesita ninguna librería de bitluni ni fabgl.
 Debemos activar la opción de PSRAM, y en caso de superar 1 MB de binario, seleccionar 4 MB de partición a la hora de subir.
-En el Arduino IDE, debemos elegir la opción <b>Partition Scheme (Huge APP).
+En el Arduino IDE, debemos elegir la opción <b>Partition Scheme (Huge APP)</b>.
 
 
 <br>
