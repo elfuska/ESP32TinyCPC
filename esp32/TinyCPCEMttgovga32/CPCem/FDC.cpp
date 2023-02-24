@@ -114,7 +114,7 @@ void loaddsk2Flash(unsigned char id)
                         //printf("%i %i %i %i  ",discid[d][c][0],discid[d][c][1],discid[d][c][2],discid[d][c][3]);
                         fread(discdat->datos[d][(discid[d][c][2]-1)&15],512,1,f);                        
                 }
-                printf("\n");
+                //printf("\n");
         }
         fclose(f);
 }
