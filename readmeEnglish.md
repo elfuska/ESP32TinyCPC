@@ -34,7 +34,7 @@ I have made several modifications:
 Required:
  <ul>
   <li>TTGO VGA32 v1.4</li>
-  <li>Arduino IDE 1.8.11 Espressif System 1.0.6</li>
+  <li>Arduino IDE 1.8.11 Espressif System 2.0.7</li>
   <li>Arduino fabgl 0.9.0 reduced library (included in PLATFORMIO project)</li>
   <li>Arduino bitluni 0.3.3 reduced library (included in project)</li>
  </ul>
