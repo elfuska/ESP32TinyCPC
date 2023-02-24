@@ -9,7 +9,7 @@ He realizado varias modificaciones:
  <li>Uso de un sólo core</li>
  <li>OSD de bajos recursos</li>
  <li>Creado proyecto compatible con Arduino IDE y Platform IO</li>
- <li>Emulación de AY8912 (libreria fabgl) versión reducida de <b>dcrespo3d</b>(David Crespo Tascón)</li>
+ <li>Emulación de AY8912 (libreria fabgl) <strike>versión reducida de <b>dcrespo3d</b>(David Crespo Tascón)</strike> versión 1.0.9</li>
  <li>Ajuste de pantalla X</li>
  <li>Menú de velocidad de CPU de emulación (AUTO), sonido, teclado</li>
  <li>Soporte para modo 8 y 64 colores (versión reducida de Ricardo Massaro).</li>
