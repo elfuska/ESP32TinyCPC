@@ -11,7 +11,7 @@ I have made several modifications:
  <li>Use of a single core</li>
  <li>Low-income OSD</li>
  <li>Created project compatible with Arduino IDE and Platform IO</li>
- <li>AY8912 emulation (fabgl library) reduced version of <b>dcrespo3d</b>(David Crespo Tascón)</li>
+ <li>AY8912 emulation (fabgl library) <strike>reduced version of <b>dcrespo3d</b>(David Crespo Tascón)</strike> version 1.0.9</li>
  <li>Screen adjustment X</li>
  <li>Emulation CPU speed menu (AUTO), sound, keyboard</li>
  <li>Support for 8 and 64 color mode (reduced version by Ricardo Massaro).</li>
@@ -35,7 +35,7 @@ Required:
  <ul>
   <li>TTGO VGA32 v1.4</li>
   <li>Arduino IDE 1.8.11 Espressif System 2.0.7</li>
-  <li>Arduino fabgl 0.9.0 reduced library (included in PLATFORMIO project)</li>
+  <li>Arduino fabgl 1.0.9 reduced library (included in PLATFORMIO project)</li>
   <li>Arduino bitluni 0.3.3 reduced library (included in project)</li>
  </ul>
 <center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TinyCPC/main/preview/ttgovga32v12.jpg'></center>
