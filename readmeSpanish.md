@@ -31,7 +31,7 @@ He realizado varias modificaciones:
 Se requiere:
  <ul>
   <li>TTGO VGA32 v1.4</li>
-  <li>Arduino IDE 1.8.11 Espressif System 1.0.6</li>
+  <li>Arduino IDE 1.8.11 Espressif System 2.0.7</li>
   <li>Librería reducida Arduino fabgl 0.9.0 (incluida en proyecto PLATFORMIO)</li>
   <li>Librería reducida Arduino bitluni 0.3.3 (incluida en proyecto)</li>
  </ul>
