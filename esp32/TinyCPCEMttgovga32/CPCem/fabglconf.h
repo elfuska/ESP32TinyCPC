@@ -38,5 +38,9 @@
 //Defines ESP32 XTAL frequency in Hz.
 #define FABGLIB_XTAL 40000000
 
+/** Core to use for CPU intensive tasks like VGA signals generation in VGATextController or VGAXXController */
+#define FABGLIB_VIDEO_CPUINTENSIVE_TASKS_CORE (WIFI_TASK_CORE_ID ^ 1) // using the same core of WiFi may cause flickering
+
+
 #endif
 #endif
