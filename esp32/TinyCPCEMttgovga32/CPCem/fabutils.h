@@ -58,7 +58,7 @@ namespace fabgl {
 
 
 #define GPIO_UNUSED GPIO_NUM_MAX
-
+#define GPIO_AUTO   ((gpio_num_t)(GPIO_NUM_MAX + 1))
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 // PSRAM_HACK
@@ -162,6 +162,8 @@ T moveItems(T dest, T src, size_t n)
 //       GPIO_MODE_INPUT_OUTPUT
 void configureGPIO(gpio_num_t gpio, gpio_mode_t mode);
 
+void esp_intr_alloc_pinnedToCore(int source, int flags, intr_handler_t handler, void * arg, intr_handle_t * ret_handle, int core);
+
 
 ///////////////////////////////////////////////////////////////////////////////////
 // AutoSemaphore
@@ -172,6 +174,24 @@ struct AutoSemaphore {
 private:
   SemaphoreHandle_t m_mutex;
 };
+
+///////////////////////////////////////////////////////////////////////////////////
+// CoreUsage
+
+/**
+ * @brief This class helps to choice a core for intensive processing tasks
+ */
+struct CoreUsage {
+
+  static int busiestCore()                 { return s_busiestCore; }
+  static int quietCore()                   { return s_busiestCore != -1 ? s_busiestCore ^ 1 : -1; }
+  static void setBusiestCore(int core)     { s_busiestCore = core; }
+
+  private:
+    static int s_busiestCore;  // 0 = core 0, 1 = core 1 (default is FABGLIB_VIDEO_CPUINTENSIVE_TASKS_CORE)
+};
+
+int calcI2STimingParams(int sampleRate, int * outA, int * outB, int * outN, int * outM);
 
 } // end of namespace
 
