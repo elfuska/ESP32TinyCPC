@@ -548,7 +548,7 @@ void ShowTinyMachineMenu()
  model = ShowTinyMenu("Machine",gb_machine_menu,max_gb_machine_menu);
  if (model != 255)
  {
-  loadroms2FlashModel();
+  loadroms();
   //switch (aSelNum)
   //{
   // case 0: model= 0; loadroms2FlashModel(0); break;
@@ -571,7 +571,7 @@ void ShowTinyResetMenu()
  aSelNum= ShowTinyMenu("Reset",gb_reset_menu,max_gb_reset_menu);
  if (aSelNum != 255)
  {
-  loadroms2FlashModel();
+  loadroms();
   resetz80();
   resetcrtc(); 
   if (aSelNum == 1)
