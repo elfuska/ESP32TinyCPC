@@ -17,6 +17,7 @@ I have made several modifications:
  <li>Support for 8 and 64 color mode (reduced version by Ricardo Massaro).</li>
  <li>DSK support with 42 tracks and 11 sectors</li>
  <li>Supports loading DSK files from SD card (files must be under /dsk).</li>
+ <li>Load ROM files from SD under /rom/[6128|664|464]/ . Both OS.rom and BASIC.rom are needed</li>
  <li>Emulates only the CRTC 0</li>
  <li>Supports 0, 1 and 2 video mode</li>
  <li>VGA 400x300</li>
