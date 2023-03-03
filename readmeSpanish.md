@@ -15,6 +15,7 @@ He realizado varias modificaciones:
  <li>Soporte para modo 8 y 64 colores (versión reducida de Ricardo Massaro).</li>
  <li>Soporte DSK de 42 tracks y 11 sectores.</li>
  <li>Carga de archivos DSK desde la tarjeta SD (deben estar en /dsk).</li>
+ <li>Carga de ROMs desde la tarjeta SD (deben estar en /rom/[6128|664|464]/ , se necesita OS.rom y BASIC.rom).</li>
  <li>Emula sólo el CRTC 0</li>
  <li>Soporta modo 0, 1 y 2 de video</li>
  <li>VGA 400x300</li>
