@@ -11,6 +11,11 @@
  #define MOUSE_DATA 27
  #define MOUSE_CLK 26
 
+#define SDCARD_CS 13
+#define SDCARD_MOSI 12
+#define SDCARD_MISO 2
+#define SDCARD_CLK 14
+
  //#define COLOR_3B
  //#define COLOR_6B
  // #define COLOR_14B
