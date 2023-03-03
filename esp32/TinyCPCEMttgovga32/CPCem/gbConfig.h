@@ -38,7 +38,7 @@
  //RAM mode
  #define use_lib_128k
  //#define use_lib_cheat_128k 
- //#define use_lib_fix_psram_128k
+ #define use_lib_fix_psram_128k
 
  //Sound
  #define use_lib_sound_ay8912
