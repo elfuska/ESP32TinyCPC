@@ -4,6 +4,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <Arduino.h>
 #include "CPCem.h"
 #include "DAA.h"
 #include "Z80.h"
@@ -14,7 +15,6 @@
 #include "CRTC.h"
 #include "8255.h"
 #include "gbGlobals.h"
-#include "dataFlash/gbrom.h"
 
 z80reg af,bc,de,hl,ix,iy,ir,saf,sbc,sde,shl;
 unsigned short pc=0;
@@ -187,13 +187,13 @@ void initz80()
  //makeznptable();
  //ImprimeTablaPrecalculada();
  //Para la rom en memoria dinamica
- //JJ lorom=(unsigned char *)calloc(0x4000,1);
+ lorom=(unsigned char *)ps_malloc(0x4000);
  for (c=0;c<16;c++)
  {
-  //hirom[c]=(unsigned char *)calloc(0x4000,1);
-  //memset(hirom[c],0,16384);  
+  hirom[c]=(unsigned char *)ps_malloc(0x4000);
+  memset(hirom[c],0,16384);  
   //hirom[c]= NULL;            
-  hirom[c]= (unsigned char*)gb_rom_464_1;
+  //hirom[c]= (unsigned char*)gb_rom_464_1;
  }
  #ifdef use_lib_mem_blocks  
   for (c=0;c<2;c++)
@@ -203,7 +203,7 @@ void initz80()
    memset(ram,1,0x10000);
   #else
    #ifdef use_lib_fix_psram_128k
-    memset(ram,1,0x10000); //Modo 128K psram
+    memset(ram,1,0x20000); //Modo 128K psram
    #else
     memset(ram,1,0x10000); //Modo 64K
    #endif 
@@ -213,55 +213,39 @@ void initz80()
  rebuildmem();
 }
 
-//Lee desde Flash todas las roms
-void loadroms2FlashModel()
+void loadroms()
 {
- //printf("Modelo %d\n",aModel);
- if (model == 2)
- {
-  #if defined(use_lib_128k) || defined(use_lib_cheat_128k) || defined(use_lib_fix_psram_128k)
-   lorom = (unsigned char*)gb_rom_6128_0; //16KB primeros 
-   hirom[0]= (unsigned char*)gb_rom_6128_1;
-  #endif 
-  //memcpy(lorom,gb_rom_6128,16384);
-  //memcpy(hirom[0],&gb_rom_6128[16384],16384);
- }
- else 
- {
-  if (model == 1)
-  {   
-   lorom = (unsigned char*)gb_rom_664_0;
-   hirom[0] = (unsigned char*)gb_rom_664_1;
-   //memcpy(lorom,gb_rom_664,16384);
-   //memcpy(hirom[0],&gb_rom_664[16384],16384);   
-  }
-  else
-  {
-   lorom = (unsigned char*)gb_rom_464_0;
-   hirom[0] = (unsigned char*)gb_rom_464_1;
-   //memcpy(lorom,gb_rom_464,16384);
-   //memcpy(hirom[0],gb_rom_464_1,16384);      
-  }
- }
- hirom[7] = (unsigned char *)gb_rom_amsdos;
- //memcpy(hirom[7],gb_rom_amsdos,16384);
- ramconfigBefore= 255; //force bank switch
- curhromBefore= 255; 
-}
+  FILE *f1, *f2;
 
-/*void loadroms()
-{
-        FILE *f;
-        if (model==2)      f=fopen("6128.rom","rb");
-        else if (model==1) f=fopen("664.rom","rb");
-        else               f=fopen("464.rom","rb");
-        fread(lorom,16384,1,f);
-        fread(hirom[0],16384,1,f);
-        fclose(f);
-        f=fopen("amsdos.rom","rb");
-        fread(hirom[7],16384,1,f);
-        fclose(f);
-}*/
+  printf("Cargando rom del modelo %i\n", model);
+  if (model==2) {
+    f1=fopen("/sd/rom/6128/OS.rom","rb");
+    f2=fopen("/sd/rom/6128/BASIC.rom","rb");
+  } else if (model==1) {
+    f1=fopen("/sd/rom/664/OS.rom","rb");
+    f2=fopen("/sd/rom/664/BASIC.rom","rb");
+  } else {
+    f1=fopen("/sd/rom/464/OS.rom","rb");
+    f2=fopen("/sd/rom/464/BASIC.rom","rb");
+  }
+
+  if (!f1 || !f2) {
+    printf("No se ha cargado la rom del modelo %i\n", model);
+    return;
+  }
+  printf ("Cargada rom del Modelo %i\n", model);
+  fread(lorom,16384,1,f1);
+  fread(hirom[0],16384,1,f2);
+  fclose(f1);
+  fclose(f2);        
+
+  f1=fopen("/sd/rom/amsdos.rom","rb");
+  fread(hirom[7],16384,1,f1);
+  fclose(f1);
+  
+  ramconfigBefore= 255; //force bank switch
+  curhromBefore= 255; 
+}
 
 void resetz80()
 {
@@ -276,7 +260,7 @@ void resetz80()
           memset(ram,0,0x10000); //truco 122880 bytes
          #else
           #ifdef use_lib_fix_psram_128k
-           memset(ram,0,0x10000); //128K psram
+           memset(ram,0,0x20000); //128K psram
           #else
            memset(ram,0,0x10000); //hay que setear memoria 64K
           #endif
@@ -3342,4 +3326,3 @@ void execz80()
                 }
         }
 }
-
