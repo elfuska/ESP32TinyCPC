@@ -19,6 +19,7 @@
 #include "PS2Kbd.h"
 #include <Arduino.h>
 #include "PS2KeyCode.h"
+#include "SD.h"
 //Para ahorrar memoria
 //JJ #include <esp_bt.h>
 
@@ -667,7 +668,8 @@ void setup()
  model=0;
  soundon=0;
  initz80();
- loadroms2FlashModel();
+ mountSD();
+ loadroms();
  resetz80();
  resetcrtc();
  getDskList();
