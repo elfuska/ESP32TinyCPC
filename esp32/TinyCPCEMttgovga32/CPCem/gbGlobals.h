@@ -143,11 +143,11 @@ extern unsigned char reading;
 extern int disctracks;
 extern int discsects[40]; //esta en rom
 //JJ extern unsigned char discdat[42][11][512];
-extern unsigned char discid[42][11][4];
+extern unsigned char discid[43][15][4];
  
  typedef struct Tdiscdats
  {
-  unsigned char datos[42][11][512];
+  unsigned char datos[43][15][1024];
  }Tdiscdat;
 extern Tdiscdat *discdat;
 
