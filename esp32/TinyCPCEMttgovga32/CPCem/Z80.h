@@ -16,7 +16,7 @@
  void loadroms();
  void execz80();
  void rebuildmem(void);
- void loadroms2FlashModel(void);
+ 
  #ifndef use_lib_lookup_znptable
   inline unsigned char Get_no_lookup_znptable(unsigned char c);
  #endif
@@ -4149,4 +4149,3 @@ const unsigned char znptable16[65536]={
 
 
 #endif
- 
